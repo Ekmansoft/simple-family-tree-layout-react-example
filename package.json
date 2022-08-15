@@ -13,8 +13,9 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
-    "simple-family-tree-layout": "^0.2.5",
-    "simple-family-tree-model": "^0.2.4",
+    "react-svg-pan-zoom": "^3.11.0",
+    "simple-family-tree-layout": "^0.2.23",
+    "simple-family-tree-model": "^0.2.9",
     "typescript": "^4.7.4",
     "web-vitals": "^2.1.4"
   },
@@ -41,5 +42,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@types/react-svg-pan-zoom": "^3.3.5"
   }
 }

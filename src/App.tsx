@@ -1,6 +1,6 @@
 import React, {useRef} from 'react';
 import logo from './logo.svg';
-import { Family, LocalTreeBackend, createProfile, Profile, ProfileSex  } from 'simple-family-tree-model';
+import { Family, LocalTreeBackend, createProfile, Profile, ProfileLink, ProfileSex  } from 'simple-family-tree-model';
 import { createFamilyLayout, generateLayout  } from 'simple-family-tree-layout'
 import { UncontrolledReactSVGPanZoom } from 'react-svg-pan-zoom'
 
@@ -57,7 +57,15 @@ let result5 = tree.addChildToFamily(newFamily2Id, newProfile1Id);
 let result6 = tree.addParentToFamily(newFamily2Id, newProfile5Id);
 let result7 = tree.addParentToFamily(newFamily2Id, newProfile6Id);
 
-let mainLayout = createFamilyLayout(tree, newProfile1Id, 1, 1);
+let focusProfileId = newProfile1Id;
+console.log(window.location.href);
+if (window.location.href.includes("profile")) {
+  let url = window.location.href;
+  let profilestring = url.substring(url.lastIndexOf('/')+1);
+  console.log(profilestring);
+  focusProfileId = new ProfileLink(profilestring);
+}
+let mainLayout = createFamilyLayout(tree, focusProfileId, 1, 1);
 
 console.log("layout with ", mainLayout.families.size, mainLayout.profiles.size);
 

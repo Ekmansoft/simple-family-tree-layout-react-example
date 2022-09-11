@@ -1,6 +1,5 @@
 import React, {useRef} from 'react';
-import logo from './logo.svg';
-import { Family, LocalTreeBackend, createProfile, Profile, ProfileLink, ProfileSex  } from 'simple-family-tree-model';
+import { Family, LocalTreeBackend, Profile, ProfileLink, ProfileSex  } from 'simple-family-tree-model';
 import { createFamilyLayout, generateLayout  } from 'simple-family-tree-layout'
 import { UncontrolledReactSVGPanZoom } from 'react-svg-pan-zoom'
 
@@ -56,7 +55,7 @@ let newFamily2Id = tree.addNewFamily(new Family());
 let result5 = tree.addChildToFamily(newFamily2Id, newProfile1Id);
 let result6 = tree.addParentToFamily(newFamily2Id, newProfile5Id);
 let result7 = tree.addParentToFamily(newFamily2Id, newProfile6Id);
-console.log("add mother and grandparents to family2", result3, result4);
+console.log("add mother and grandparents to family2", result5, result6, result7);
 
 console.log("Create parents of father in family1 and thus family3");
 let newProfile7Id = createAndAddProfile(tree, "Grandma Helgesson", ProfileSex.Female, "186630303", "Umeå, Sweden", "19030303", "Vännäs, Sweden");
@@ -67,7 +66,7 @@ let newFamily3Id = tree.addNewFamily(new Family());
 let result8 = tree.addChildToFamily(newFamily3Id, newProfile2Id);
 let result9 = tree.addParentToFamily(newFamily3Id, newProfile7Id);
 let result10 = tree.addParentToFamily(newFamily3Id, newProfile8Id);
-console.log("add father and grandparents to family3", result3, result4);
+console.log("add father and grandparents to family3", result8, result9, result10);
 
 let focusProfileId = newProfile1Id;
 console.log(window.location.href);
@@ -83,7 +82,6 @@ console.log("layout with ", mainLayout.families.size, mainLayout.profiles.size);
 
 
 function App() {
-  const Viewer = useRef(null);
   return (
     <div className="App">
       <header className="App-header">

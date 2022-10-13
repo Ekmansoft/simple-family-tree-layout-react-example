@@ -1,6 +1,6 @@
 {
   "name": "simple-family-tree-layout-react-example",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "dependencies": {
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",

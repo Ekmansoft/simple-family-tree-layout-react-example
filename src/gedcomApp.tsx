@@ -1,8 +1,7 @@
 import React from 'react';
 import { LocalTreeBackend, ProfileLink } from 'simple-family-tree-model';
-import { createFamilyLayout, RootLayout, generateVerticalTreeLayout, generateProfileList } from 'simple-family-tree-layout'
-//import { UncontrolledReactSVGPanZoom } from 'react-svg-pan-zoom'
-import { decodeGedcom } from './decode-gedcom';
+import { createFamilyLayout, RootLayout, generateProfileList, VerticalTreeLayout } from 'simple-family-tree-layout'
+import { buildTreeFromRemoteGedcomFile } from 'simple-family-tree-gedcom-decoder';
 
 import './App.css';
 
@@ -10,101 +9,84 @@ interface FamilyTreeState {
   tree: LocalTreeBackend,
   filename: string,
   fileDecoded:boolean,
-  layoutCreated: boolean,
   focusProfile:string,
-  layout: RootLayout
+  layout: RootLayout,
 }
 
-async function buildTreeFromFile(tree: LocalTreeBackend, filename: string): Promise<boolean>  {
-  const response =  await fetch(filename);
-  if (!response.ok) {
-    const message = `An error has occured: ${response.status}`;
-    console.log(message);
-    throw new Error(message);
+const styles = {
+  container: {
+    width:"100%",
+    height:"100%",
+    class:"row"
+  },
+  listColumn: {
+    overflowY: "scroll",
+    width:"300px",
+    float:"left",
+  },
+  treeColumn: {
+    float:"right",
+    width:"50%",
   }
-  const gedcomData = await response.text();
-  console.log("gedcom length:", gedcomData.length);
-  decodeGedcom(tree, gedcomData);
 
-  const rootProfile = tree.getRootProfile();
-  if (rootProfile !== undefined) {
-    console.log("root profile ", rootProfile.itemLink);
-    return true;
-  }
-  console.log("failed decoding gedcom");
-  return false;
-}
+} as const;
+
+
 
 export class FamilyTreeComponent extends React.Component<{},FamilyTreeState> {
-  //filename:'../export-BloodTree-2018.ged',
-  //filename:'../555sample.ged',
   state: FamilyTreeState = {
     tree: new LocalTreeBackend(),
-    filename:'../555sample.ged',
+    filename:'./555SAMPLE.GED',
     fileDecoded:false,
-    layoutCreated: false,
     focusProfile:"",
     layout: new RootLayout()
   };
 
   private async handleDecode(): Promise<boolean> {
     console.log("gedcom decode start");
-    const result = await buildTreeFromFile(this.state.tree, this.state.filename);
+    const result = await buildTreeFromRemoteGedcomFile(this.state.tree, this.state.filename);
     this.setState({fileDecoded: true})
     console.log("gedcom decode done", result);
     return true;
   }
 
-render() {
-  if (!this.state.fileDecoded) {
-    this.handleDecode();
-  }
-  let focusProfileLocal = this.state.tree.getRootProfile();
-  console.log(window.location.href);
-  if (window.location.href.includes("profile")) {
-    let url = window.location.href;
-    let profilestring = url.substring(url.lastIndexOf('/')+1);
-    console.log(profilestring);
-    focusProfileLocal = new ProfileLink(profilestring);
-    if (focusProfileLocal.itemLink !== this.state.focusProfile) {
-      this.setState({layoutCreated: false})
-      this.setState({focusProfile: focusProfileLocal.itemLink})
+  render() {
+    if (!this.state.fileDecoded) {
+      this.handleDecode();
     }
-    //this.state.layout.anchorProfile = profilestring;
-  }
-  if (focusProfileLocal !== undefined) {
-    if (!this.state.layoutCreated) {
-      this.setState({layout: createFamilyLayout(this.state.tree, focusProfileLocal, 2, 2)})
-      this.setState({layoutCreated: true})
+    let focusProfileLocal = this.state.tree.getRootProfile();
+    console.log(window.location.href);
+    if (window.location.href.includes("profile")) {
+      let url = window.location.href;
+      let profilestring = url.substring(url.lastIndexOf('/')+1);
+      console.log("focusprofile ", profilestring);
+      focusProfileLocal = new ProfileLink(profilestring);
     }
-    return (
-        <div style={{display: "grid", gridTemplateColumns: "30% 70%"}}>
-            <div>{generateProfileList(this.state.tree)}</div>
-            <div><svg width="800" height="800">
-            {generateVerticalTreeLayout(this.state.layout)}
-            </svg></div>
-        </div>
-    )
-  } else {
-    return (
-        <div>
-          Loading...
-        </div>
-    )
+    console.log("focusprofile2 ", focusProfileLocal);
+    if (focusProfileLocal !== undefined) {
+      return (
+          <div style={styles.container}>
+              <div style={styles.listColumn}>{generateProfileList(this.state.tree)}</div>
+              <div style={styles.treeColumn}>
+              <VerticalTreeLayout tree={this.state.tree}
+                                  layout={createFamilyLayout(this.state.tree, focusProfileLocal, 2, 2)}
+                                  focusProfile={focusProfileLocal} />
+              </div>
+          </div>
+      )
+    } else {
+      return (
+          <div>
+            Loading...
+          </div>
+      )
+    }
   }
 }
-
-}
-
-
-//let tree = new LocalTreeBackend();
 
 
 const App = () => {
   console.log("App start");
-  //const { data, error, isPending } = useAsync({ promiseFn: buildTreeLayout })
-
-  console.log("gedfile");
 
   return (
     <div className="App">
@@ -115,38 +97,5 @@ const App = () => {
     );
   }
 
-// function AppScrollable() {
-//   const Viewer = useRef(null);
-//   return (
-//     <div className="App">
-//       <header className="App-header">
-//         <UncontrolledReactSVGPanZoom
-//         ref={Viewer}
-//         width={800} height={800}
-//         onZoom={e => console.log('zoom')}
-//         onPan={e => console.log('pan')}
-//         onClick={event => console.log('click', event.x, event.y, event.originalEvent)}
-//       >
-//         <svg width="800" height="800">
-//             {generateLayout(mainLayout)}
-
-//             </svg>
-//         </UncontrolledReactSVGPanZoom>
-
-//         <p>
-//           Edit <code>src/App.tsx</code> and save to reload.
-//         </p>
-//         <a
-//           className="App-link"
-//           href="https://reactjs.org"
-//           target="_blank"
-//           rel="noopener noreferrer"
-//         >
-//           Learn React
-//         </a>
-//       </header>
-//     </div>
-//   );
-// }
 
 export default App;
